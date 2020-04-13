@@ -154,10 +154,26 @@ function wordpressImport(backupXmlFile, outputDir){
                     tags = [];
 
                     var categories = post.category;
+                    var wpCategoriesString = '';
+                    var wpTagsString = '';
                     var tagString = '';
 
                     if (categories && categories.length){
-                        tags = tags.concat(extractWpCategories(categories));
+                        var wp_categories = [];
+                        var wp_tags = [];
+
+                        wp_categories = extractWpCategories(categories);
+                        wp_tags = extractWpTags(categories);
+
+                        if (wp_categories && wp_categories.length){
+                          wpCategoriesString = 'wp_categories: [\'' + wp_categories.join("', '") + "']\n";
+                        }
+
+                        if (wp_tags && wp_tags.length){
+                          wpTagsString = 'wp_tags: [\'' + wp_tags.join("', '") + "']\n";
+                        }
+
+                        tags = wp_categories.concat(wp_tags);
                         tagString = 'tags: [\'' + tags.join("', '") + "']\n";
                     }
 
@@ -174,7 +190,7 @@ function wordpressImport(backupXmlFile, outputDir){
                         markdown = tds.turndown(content);
                         // console.log(markdown);
 
-                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: ${draft}\nold_wp_id: ${old_wp_id}\nold_wp_url: ${old_wp_url}\n${tagString}---`;
+                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: ${draft}\nold_wp_id: ${old_wp_id}\nold_wp_url: ${old_wp_url}\n${tagString}${wpCategoriesString}${wpTagsString}---`;
                         fileContent = `${fileHeader}\n${markdown}`;
                         pmap.header = `${fileHeader}\n`;
 
@@ -437,10 +453,23 @@ function writeComments(postMaps){
 function extractWpCategories(categories){
   var cats = [];
   categories.forEach(function (category){
-    cats.push(category['_']);
+    if (category['$']['domain'] == 'category') {
+      cats.push(category['_']);
+    }
   });
 
   return cats;
+}
+
+function extractWpTags(categories){
+  var tgs = [];
+  categories.forEach(function (category){
+    if (category['$']['domain'] == 'post_tag') {
+      tgs.push(category['_']);
+    }
+  });
+
+  return tgs;
 }
 
 function writeToFile(filename, content, append=false){
