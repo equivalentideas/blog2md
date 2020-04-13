@@ -112,6 +112,8 @@ function wordpressImport(backupXmlFile, outputDir){
                 var tags = [];
                 var draft = false;
                 var published = '';
+                var old_wp_id = '';
+                var old_wp_url = '';
                 var comments = [];
                 var fname = '';
                 var markdown = '';
@@ -129,6 +131,8 @@ function wordpressImport(backupXmlFile, outputDir){
                     // if (title && title.indexOf("'")!=-1){
                     title = title.replace(/'/g, "''");
                     // }
+                    old_wp_id = post["wp:post_id"]
+                    old_wp_url = post.link
 
                     draft = post["wp:status"] == "draft"
                     published = post.pubDate;
@@ -177,7 +181,7 @@ function wordpressImport(backupXmlFile, outputDir){
                         markdown = tds.turndown(content);
                         // console.log(markdown);
 
-                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: ${draft}\n${tagString}---\n`;
+                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: ${draft}\nold_wp_id: ${old_wp_id}\nold_wp_url: ${old_wp_url}\n${tagString}---`;
                         fileContent = `${fileHeader}\n${markdown}`;
                         pmap.header = `${fileHeader}\n`;
 
