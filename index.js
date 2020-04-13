@@ -135,7 +135,7 @@ function wordpressImport(backupXmlFile, outputDir){
                     old_wp_url = post.link
 
                     draft = post["wp:status"] == "draft"
-                    published = post.pubDate;
+                    published = post["wp:post_date"];
                     comments = post['wp:comment'];
                     fname = post["wp:post_name"][0] || post["wp:post_id"];
                     markdown = '';
