@@ -157,15 +157,8 @@ function wordpressImport(backupXmlFile, outputDir){
                     var tagString = '';
 
                     if (categories && categories.length){
-                        categories.forEach(function (category){
-                            // console.log(category['_']);
-                            tags.push(category['_']);
-                        });
-
-                        // console.log(tags.join(", "));
-                        // tags = tags.join(", ");
+                        tags = tags.concat(extractWpCategories(categories));
                         tagString = 'tags: [\'' + tags.join("', '") + "']\n";
-                        // console.log(tagString);
                     }
 
                     var pmap = {fname:'', comments:[]};
@@ -441,7 +434,14 @@ function writeComments(postMaps){
     }
 }
 
+function extractWpCategories(categories){
+  var cats = [];
+  categories.forEach(function (category){
+    cats.push(category['_']);
+  });
 
+  return cats;
+}
 
 function writeToFile(filename, content, append=false){
 
