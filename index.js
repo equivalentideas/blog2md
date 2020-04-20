@@ -114,6 +114,8 @@ function wordpressImport(backupXmlFile, outputDir){
                 var published = '';
                 var old_wp_id = '';
                 var old_wp_url = '';
+                var wp_postmeta_media_source = []
+                var old_wp_media_source = '';
                 var comments = [];
                 var fname = '';
                 var markdown = '';
@@ -138,6 +140,13 @@ function wordpressImport(backupXmlFile, outputDir){
                     published = post["wp:post_date"];
                     comments = post['wp:comment'];
                     fname = post["wp:post_name"][0] || post["wp:post_id"];
+
+                    wp_postmeta_media_source = post["wp:postmeta"].filter(item => item["wp:meta_key"][0] == "eg-media-source")
+
+                    if (wp_postmeta_media_source.length) {
+                      old_wp_media_source = wp_postmeta_media_source[0]["wp:meta_value"];
+                    }
+
                     markdown = '';
                     // if (post.guid && post.guid[0] && post.guid[0]['_']){
                     //     fname = path.basename(post.guid[0]['_']);
@@ -190,7 +199,7 @@ function wordpressImport(backupXmlFile, outputDir){
                         markdown = tds.turndown(content);
                         // console.log(markdown);
 
-                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: ${draft}\nold_wp_id: ${old_wp_id}\nold_wp_url: ${old_wp_url}\n${tagString}${wpCategoriesString}${wpTagsString}---`;
+                        fileHeader = `---\ntitle: '${title}'\ndate: ${published}\ndraft: ${draft}\nold_wp_id: ${old_wp_id}\nold_wp_url: ${old_wp_url}\nold_wp_media_source: ${old_wp_media_source}\n${tagString}${wpCategoriesString}${wpTagsString}---`;
                         fileContent = `${fileHeader}\n${markdown}`;
                         pmap.header = `${fileHeader}\n`;
 
